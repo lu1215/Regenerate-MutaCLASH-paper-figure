@@ -16,7 +16,7 @@ pip install -r requirements.txt
    ```
 2. Run the processing script:
    ```bash
-   sh run_additional.sh --input PRG-1
+   bash run_additional.sh --input PRG-1
    ```
 3. The output will be saved in:
    ```
@@ -39,7 +39,7 @@ pip install -r requirements.txt
    ```
 2. Execute the following command:
    ```bash
-   sh run_additional.sh --input ALG-1
+   bash run_additional.sh --input ALG-1
    ```
 3. The results will be saved in:
    ```
@@ -57,7 +57,7 @@ pip install -r requirements.txt
 
 ## run_additional.sh
 ```bash
-sh run_additional.sh --input <PRG-1 or ALG-1>
+bash run_additional.sh --input <PRG-1 or ALG-1>
 ```
 **required arguments:**
 - **input**: PRG-1 or ALG-1.
