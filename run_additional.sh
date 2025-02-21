@@ -164,46 +164,46 @@ mkdir data/output/${DIR}
 cp pipeline/${OUTPUT} data/output/${DIR}/${DATA}.csv
 cp pipeline/${OUTPUT} data/output/${DIR}/${DATA}.csv
 # rename name of columns in data/output/${DIR}/${DATA}.csv
-cp data/output/${DIR}/${DATA}.csv data/output/${DIR}/${DATA}_short.csv
+# cp data/output/${DIR}/${DATA}.csv data/output/${DIR}/${DATA}_short.csv
 
-python FilterReorderCsv.py data/output/${DIR}/${DATA}_short.csv data/output/${DIR}/${DATA}_short.csv
+# python FilterReorderCsv.py data/output/${DIR}/${DATA}_short.csv data/output/${DIR}/${DATA}_short.csv
 
-# rename name of columns in data/output/${DIR}/${DATA}.csv
-sed -i \
-    -e '1s|hybrid_seq|CLASH read sequence|' \
-    -e '1s|read_count|read count|' \
-    -e '1s|regulator_name|Regulator RNA Name|' \
-    -e '1s|transcript_name|Target RNA Name|' \
-    -e '1s|rem_tran_target_pos|Target RNA Region Found in CLASH Read|' \
-    -e '1s|reg_hyb_target_pos|Regulator RNA Region Found in CLASH Read|' \
-    -e '1s|on_reg_pos|Region on CLASH Read identified as Regulator RNA|' \
-    -e '1s|remain_pos|Region on CLASH Read identified as Target RNA|' \
-    -e '1s|targeting_score|pirScan score|' \
-    -e '1s|mir_score|miRanda score|' \
-    -e '1s|mir_init_pos|Extended Clash Identified Region Start Position (miRanda)|' \
-    -e '1s|mir_end_pos|Extended Clash Identified Region End Position (miRanda)|' \
-    -e '1s|mir_target_pos|miRanda Defined Binding Region (Relative to Extended Clash Identified Region)|' \
-    -e '1s|mir_transcript_seq|Target Binding Sequence (miRanda)|' \
-    -e '1s|mir_regulator_seq|Regulator Binding Sequence (miRanda)|' \
-    -e '1s|up_init_pos|Extended Clash Identified Region Start Position (RNAup)|' \
-    -e '1s|up_end_pos|Extended Clash Identified Region End Position (RNAup)|' \
-    -e '1s|RNAup_transcript_seq|Target Binding Sequence (RNAup)|' \
-    -e '1s|RNAup_regulator_seq|Regulator Binding Sequence (RNAup)|' \
-    -e '1s|RNAup_target_pos|RNAup Defined Binding Region (Relative to Clash Identified Region)|' \
-    -e '1s|RNAup_score|RNAup Binding Energy|' \
-    -e '1s|D|Deletion Sites on mRNA (Absolute Positions)|' \
-    -e '1s|M|Mismatch Sites on mRNA (Absolute Positions)|' \
-    -e '1s|Nor_readcount|Normalized Read Count (After Read Deduplication)|' \
-    -e '1s|Nor_count|Normalized Count (After Read Deduplication)|' \
-    -e '1s|Overlap|Overlapping Region Between Regulator and Transcript (Hybrid Read Coordinates)|' \
-    -e '1s|mRNA_len|mRNA Length|' \
-    -e '1s|Hybrid_read|Transcript-Regulator Pair (For Pair Counting)|' \
-    -e '1s|,A|,Mutation Sites on mRNA (Deletion + Mismatch, Absolute Positions)|' \
-    -e '1s|mir_energy|Binding Energy Calculated by miRanda|' \
-    -e '1s|pirscan|pirScan|' \
-    -e '1s|miranda|miRanda|' \
-    -e '1s|rnaup|RNAup|' \
-    data/output/${DIR}/${DATA}_short.csv
+# # rename name of columns in data/output/${DIR}/${DATA}.csv
+# sed -i \
+#     -e '1s|hybrid_seq|CLASH read sequence|' \
+#     -e '1s|read_count|read count|' \
+#     -e '1s|regulator_name|Regulator RNA Name|' \
+#     -e '1s|transcript_name|Target RNA Name|' \
+#     -e '1s|rem_tran_target_pos|Target RNA Region Found in CLASH Read|' \
+#     -e '1s|reg_hyb_target_pos|Regulator RNA Region Found in CLASH Read|' \
+#     -e '1s|on_reg_pos|Region on CLASH Read identified as Regulator RNA|' \
+#     -e '1s|remain_pos|Region on CLASH Read identified as Target RNA|' \
+#     -e '1s|targeting_score|pirScan score|' \
+#     -e '1s|mir_score|miRanda score|' \
+#     -e '1s|mir_init_pos|Extended Clash Identified Region Start Position (miRanda)|' \
+#     -e '1s|mir_end_pos|Extended Clash Identified Region End Position (miRanda)|' \
+#     -e '1s|mir_target_pos|miRanda Defined Binding Region (Relative to Extended Clash Identified Region)|' \
+#     -e '1s|mir_transcript_seq|Target Binding Sequence (miRanda)|' \
+#     -e '1s|mir_regulator_seq|Regulator Binding Sequence (miRanda)|' \
+#     -e '1s|up_init_pos|Extended Clash Identified Region Start Position (RNAup)|' \
+#     -e '1s|up_end_pos|Extended Clash Identified Region End Position (RNAup)|' \
+#     -e '1s|RNAup_transcript_seq|Target Binding Sequence (RNAup)|' \
+#     -e '1s|RNAup_regulator_seq|Regulator Binding Sequence (RNAup)|' \
+#     -e '1s|RNAup_target_pos|RNAup Defined Binding Region (Relative to Clash Identified Region)|' \
+#     -e '1s|RNAup_score|RNAup Binding Energy|' \
+#     -e '1s|D|Deletion Sites on mRNA (Absolute Positions)|' \
+#     -e '1s|M|Mismatch Sites on mRNA (Absolute Positions)|' \
+#     -e '1s|Nor_readcount|Normalized Read Count (After Read Deduplication)|' \
+#     -e '1s|Nor_count|Normalized Count (After Read Deduplication)|' \
+#     -e '1s|Overlap|Overlapping Region Between Regulator and Transcript (Hybrid Read Coordinates)|' \
+#     -e '1s|mRNA_len|mRNA Length|' \
+#     -e '1s|Hybrid_read|Transcript-Regulator Pair (For Pair Counting)|' \
+#     -e '1s|,A|,Mutation Sites on mRNA (Deletion + Mismatch, Absolute Positions)|' \
+#     -e '1s|mir_energy|Binding Energy Calculated by miRanda|' \
+#     -e '1s|pirscan|pirScan|' \
+#     -e '1s|miranda|miRanda|' \
+#     -e '1s|rnaup|RNAup|' \
+#     data/output/${DIR}/${DATA}_short.csv
 
 cp -r pipeline/generate_figure/figure data/output/${DIR}/
 cp -r pipeline/generate_figure/log data/output/${DIR}/
