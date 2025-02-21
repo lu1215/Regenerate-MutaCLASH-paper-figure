@@ -5,14 +5,14 @@ To get started, clone the repository and install the required dependencies:
 
 ```bash
 git clone https://github.com/lu1215/MutaCLASH.git
-cd MutaCLASH/generate_paper_figures
+cd MutaCLASH
 pip install -r requirements.txt
 ```
 
 ## PRG-1 CLASH Data Processing
 1. **[Download the PRG-1.csv file](http://nas.csblab.ee.ncku.edu.tw:32200/sharing/iXKXJG1yb)** and place it in the following directory:
    ```
-   MutaCLASH/generate_paper_figures/input
+   MutaCLASH/data/input
    ```
 2. Run the processing script:
    ```bash
@@ -20,7 +20,7 @@ pip install -r requirements.txt
    ```
 3. The output will be saved in:
    ```
-   MutaCLASH/generate_paper_figures/output/PRG-1_<date_time>/
+   MutaCLASH/data/output/PRG-1_<date_time>/
    ```
    This folder contains:
    - CSV file:
@@ -35,7 +35,7 @@ pip install -r requirements.txt
 ## ALG-1 CLASH Data Processing
 1. **[Download the ALG-1.csv file](http://nas.csblab.ee.ncku.edu.tw:32200/sharing/iXKXJG1yb)** and place it in:
    ```
-   MutaCLASH/generate_paper_figures/input
+   MutaCLASH/data/input
    ```
 2. Execute the following command:
    ```bash
@@ -43,7 +43,7 @@ pip install -r requirements.txt
    ```
 3. The results will be saved in:
    ```
-   MutaCLASH/generate_paper_figures/output/ALG-1_<date_time>/
+   MutaCLASH/data/output/ALG-1_<date_time>/
    ```
    This folder contains:
    - CSV file:
