@@ -5,14 +5,14 @@ To get started, clone the repository and install the required dependencies:
 
 ```bash
 git clone https://github.com/lu1215/MutaCLASH.git
-cd MutaCLASH
+cd Regenerate-MutaCLASH-paper-figure
 pip install -r requirements.txt
 ```
 
 ## PRG-1 CLASH Data Processing
 1. **[Download the PRG-1.csv file](http://nas.csblab.ee.ncku.edu.tw:32200/sharing/iXKXJG1yb)** and place it in the following directory:
    ```
-   MutaCLASH/data/input
+   Regenerate-MutaCLASH-paper-figure/data/input
    ```
 2. Run the processing script:
    ```bash
@@ -20,7 +20,7 @@ pip install -r requirements.txt
    ```
 3. The output will be saved in:
    ```
-   MutaCLASH/data/output/PRG-1_<date_time>/
+   Regenerate-MutaCLASH-paper-figure/data/output/PRG-1_<date_time>/
    ```
    This folder contains:
    - CSV file:
@@ -35,7 +35,7 @@ pip install -r requirements.txt
 ## ALG-1 CLASH Data Processing
 1. **[Download the ALG-1.csv file](http://nas.csblab.ee.ncku.edu.tw:32200/sharing/iXKXJG1yb)** and place it in:
    ```
-   MutaCLASH/data/input
+   Regenerate-MutaCLASH-paper-figure/data/input
    ```
 2. Execute the following command:
    ```bash
@@ -43,7 +43,7 @@ pip install -r requirements.txt
    ```
 3. The results will be saved in:
    ```
-   MutaCLASH/data/output/ALG-1_<date_time>/
+   Regenerate-MutaCLASH-paper-figure/data/output/ALG-1_<date_time>/
    ```
    This folder contains:
    - CSV file:
@@ -62,13 +62,13 @@ sh run_additional.sh --input <PRG-1 or ALG-1>
 **required arguments:**
 - **input**: PRG-1 or ALG-1.
 
-<!-- See https://github.com/lu1215/MutaCLASH/tree/master/examples/paper%20data for an example. -->
+<!-- See https://github.com/lu1215/Regenerate-MutaCLASH-paper-figure/tree/master/examples/paper%20data for an example. -->
 
 run_additional.sh is used to regenerate figures on paper; the user must first place ALG-1.csv and PRG-1.csv in the data/input folder before running this program.
 
 [Reference metadata files and output files](http://nas.csblab.ee.ncku.edu.tw:32200/sharing/jSirL0jvo)
 
-<!-- After executing the command, the pipeline will run and complete all the necessary steps. Please refer to the [examples](https://github.com/lu1215/MutaCLASH/tree/master/examples) we provided. -->
+<!-- After executing the command, the pipeline will run and complete all the necessary steps. Please refer to the [examples](https://github.com/lu1215/Regenerate-MutaCLASH-paper-figure/tree/master/examples) we provided. -->
 
 
 ## Output
