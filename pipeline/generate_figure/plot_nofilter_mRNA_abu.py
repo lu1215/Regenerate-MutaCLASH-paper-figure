@@ -197,8 +197,11 @@ for group in [0]:
                 out = KS_test(list(x), list(y))
                 KS_m = np.format_float_scientific(out[1], precision = 1)
                 KS_c = np.format_float_scientific(out[2], precision = 1)
+                _, P_m = permutation_test(list(x), list(y), num_permutations=1000, alternative="greater")
+                _, P_c = permutation_test(list(x), list(y), num_permutations=1000, alternative="less")
 
                 text = 'U test: {} > {}: {}'.format(mut_n, 'com',U_m)+'\nU test: {} < {}: {}'.format(mut_n, 'com', U_c,)+'\n-----------------------------------------\nT test: {} > {}: {}'.format(mut_n, 'com', T_m)+'\nT test: {} < {}: {}'.format(mut_n, 'com', T_c)+'\n-----------------------------------------\nKS test: {} > {}: {}'.format(mut_n, 'com', KS_m)+'\nKS test: {} < {}: {}'.format(mut_n, 'com', KS_c)
+                text += '\n-----------------------------------------\nPermutation test: {} > {}: {}'.format(mut_n, 'com', P_m)+'\nPermutation test: {} < {}: {}'.format(mut_n, 'com', P_c)
                 #print(text)
                 ax1.text(1.6,0,text,fontsize=14, verticalalignment='baseline')
 
@@ -241,8 +244,11 @@ for group in [0]:
                 out = KS_test(list(x), list(y))
                 KS_m = np.format_float_scientific(out[1], precision = 1)
                 KS_c = np.format_float_scientific(out[2], precision = 1)
+                _, P_m = permutation_test(list(x), list(y), num_permutations=1000, alternative="greater")
+                _, P_c = permutation_test(list(x), list(y), num_permutations=1000, alternative="less")
 
                 text = 'U test: {} > {}: {}'.format(mut_n, 'com',U_m)+'\nU test: {} < {}: {}'.format(mut_n, 'com', U_c,)+'\n-----------------------------------------\nT test: {} > {}: {}'.format(mut_n, 'com', T_m)+'\nT test: {} < {}: {}'.format(mut_n, 'com', T_c)+'\n-----------------------------------------\nKS test: {} > {}: {}'.format(mut_n, 'com', KS_m)+'\nKS test: {} < {}: {}'.format(mut_n, 'com', KS_c)
+                text += '\n-----------------------------------------\nPermutation test: {} > {}: {}'.format(mut_n, 'com', P_m)+'\nPermutation test: {} < {}: {}'.format(mut_n, 'com', P_c)
                 #print(text)
                 ax2.text(1.6,0,text,fontsize=14, verticalalignment='baseline')
                 plt.tight_layout()

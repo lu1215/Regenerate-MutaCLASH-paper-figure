@@ -96,6 +96,30 @@ def U_test(x,y):
     #print(two_sided, greater,less )
     return [two_sided, greater, less]
 
+def permutation_test(data1, data2, num_permutations=1000, alternative='two-sided'):
+    observed_diff = np.mean(data1) - np.mean(data2)
+    combined = np.concatenate([data1, data2])
+    count = 0
+
+    for _ in range(num_permutations):
+        np.random.shuffle(combined)
+        new_data1 = combined[:len(data1)]
+        new_data2 = combined[len(data1):]
+        new_diff = np.mean(new_data1) - np.mean(new_data2)
+
+        if alternative == 'two-sided':
+            if abs(new_diff) >= abs(observed_diff):
+                count += 1
+        elif alternative == 'greater':
+            if new_diff >= observed_diff:
+                count += 1
+        elif alternative == 'less':
+            if new_diff <= observed_diff:
+                count += 1
+
+    p_value = count / num_permutations
+    return observed_diff, p_value
+
 args = get_args()
 basename = args.basename
 inputname = args.inputname
