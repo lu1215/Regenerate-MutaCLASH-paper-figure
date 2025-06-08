@@ -515,13 +515,18 @@ def pairing_plot(plot_diff=False):
                             new_df = pd.concat([new_df, tmp_df])
                         plot_df = new_df[new_df['region'] == box]
 
+                        order = list(range(pos, 0, -1)) if diff else list(range(pos, -1, -1))
+                        plot_df['x'] = pd.Categorical(plot_df['x'], categories=order, ordered=True)
+
                         fig, ax = plt.subplots(1,1, figsize=(15,4), dpi=200)
                         if diff:
                             palette = ['#9abbff']*pos
                         else:
-                            palette = ['#dddcdc'] + ['#9abbff']*pos
+                            # palette = ['#dddcdc'] + ['#9abbff']*pos
+                            # reverse x axis
+                            palette = ['#9abbff'] * pos + ['#dddcdc']
                             
-                        ax = sns.boxplot(data=plot_df, x='x', y='y', width=0.3, showfliers=False,
+                        ax = sns.boxplot(data=plot_df, x='x', y='y', width=0.3, showfliers=False, order=order,
                                         showmeans=False, medianprops=dict(color='orange'), palette=palette)
                         ax.set_ylabel('pairing ratio')
                         ax.set_xlabel('mutation position')
@@ -549,23 +554,33 @@ def pairing_plot(plot_diff=False):
                             ax.axhline(y=med, linestyle='dashed', linewidth=0.7)
                             ## ---------------------------------------------------------   ##
                             ax.set_title(box, y=1.07)
-                            ax.axvline(x=0.5,c='k',linestyle='dashed', linewidth=0.7)
+                            # ax.axvline(x=0.5,c='k',linestyle='dashed', linewidth=0.7)
+                            tick_positions = ax.get_xticks()
+                            ax.axvline(x=tick_positions[-1] - 0.5, c='k', linestyle='dashed', linewidth=0.7)
+
                             labels = [item.get_text() for item in ax.get_xticklabels()]
-                            labels[0] = 'ALL'
+                            # labels[0] = 'ALL'
+                            labels[-1] = 'ALL'
                             ax.set_xticklabels(labels)
 
                             # statistical test (U-test)
                             ylim = ax.get_ylim()
                             test_pos = ylim[1] + 0.02 * (ylim[1] - ylim[0])
+
+                            xticks = ax.get_xticks()
+                            xtick_labels = [int(t.get_text()) if t.get_text().isdigit() else 0 for t in ax.get_xticklabels()]
+
                             for i in range(1, pos+1):
                                 sample1 = plot_df.loc[ plot_df['x']==0, 'y']
                                 sample2 = plot_df.loc[ plot_df['x']==i, 'y']
                                 _, p = stats.mannwhitneyu(sample1, sample2)
-                                
+                                plot_x = xticks[xtick_labels.index(i)]
                                 if p < 0.05:
-                                    ax.text(i-0.15, test_pos, '**')
+                                    # ax.text(i-0.15, test_pos, '**')
+                                    ax.text(plot_x, test_pos, '**', ha='center')
                                 elif p < 0.1:
-                                    ax.text(i-0.05, test_pos, '*')
+                                    # ax.text(i-0.05, test_pos, '*')
+                                    ax.text(plot_x, test_pos, '*', ha='center')
                             if plot_diff:
                                 plt.savefig('figure/pairing_ratio_plot/plot_diff/{}_{}_{}_{}_{}_miRanda.{}'.format(d_name, mut, sd_type, rc_type, box, fig_type), bbox_inches='tight')
                         

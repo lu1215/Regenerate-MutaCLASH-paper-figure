@@ -143,13 +143,18 @@ for group in [0]:
             print(len(del_clash_result), len(no_del_clash_result))
             # three different score
             no_one_third_data = no_del_clash_result[no_del_clash_result[score_type]<=one_third]
-            no_one_third_data = no_one_third_data[no_one_third_data[score_type]>bot]
+            # 20250606 without filter value data < bot 
+            # no_one_third_data = no_one_third_data[no_one_third_data[score_type]>bot]
             no_two_third_data = no_del_clash_result[no_del_clash_result[score_type]>one_third]
             no_two_third_data = no_two_third_data[no_two_third_data[score_type]<=two_third]
             no_three_third_data = no_del_clash_result[no_del_clash_result[score_type]>two_third]
             no_three_third_data = no_three_third_data[no_three_third_data[score_type]<=top]
 
-            del_one_third_data = del_clash_result[del_clash_result[score_type]>bot]
+            # filter out value of data < bot
+            # del_one_third_data = del_clash_result[del_clash_result[score_type]>bot]
+
+            # 20250606 without filter value data < bot 
+            del_one_third_data = del_clash_result
             del_one_third_data = del_one_third_data[del_one_third_data[score_type]<=one_third]
             del_two_third_data = del_clash_result[del_clash_result[score_type]>one_third]
             del_two_third_data = del_two_third_data[del_two_third_data[score_type]<=two_third]
@@ -197,8 +202,8 @@ for group in [0]:
                 out = KS_test(list(x), list(y))
                 KS_m = np.format_float_scientific(out[1], precision = 1)
                 KS_c = np.format_float_scientific(out[2], precision = 1)
-                _, P_m = permutation_test(list(x), list(y), num_permutations=1000, alternative="greater")
-                _, P_c = permutation_test(list(x), list(y), num_permutations=1000, alternative="less")
+                _, P_m = permutation_test(list(x), list(y), num_permutations=10000, alternative="greater")
+                _, P_c = permutation_test(list(x), list(y), num_permutations=10000, alternative="less")
 
                 text = 'U test: {} > {}: {}'.format(mut_n, 'com',U_m)+'\nU test: {} < {}: {}'.format(mut_n, 'com', U_c,)+'\n-----------------------------------------\nT test: {} > {}: {}'.format(mut_n, 'com', T_m)+'\nT test: {} < {}: {}'.format(mut_n, 'com', T_c)+'\n-----------------------------------------\nKS test: {} > {}: {}'.format(mut_n, 'com', KS_m)+'\nKS test: {} < {}: {}'.format(mut_n, 'com', KS_c)
                 text += '\n-----------------------------------------\nPermutation test: {} > {}: {}'.format(mut_n, 'com', P_m)+'\nPermutation test: {} < {}: {}'.format(mut_n, 'com', P_c)
@@ -244,8 +249,8 @@ for group in [0]:
                 out = KS_test(list(x), list(y))
                 KS_m = np.format_float_scientific(out[1], precision = 1)
                 KS_c = np.format_float_scientific(out[2], precision = 1)
-                _, P_m = permutation_test(list(x), list(y), num_permutations=1000, alternative="greater")
-                _, P_c = permutation_test(list(x), list(y), num_permutations=1000, alternative="less")
+                _, P_m = permutation_test(list(x), list(y), num_permutations=10000, alternative="greater")
+                _, P_c = permutation_test(list(x), list(y), num_permutations=10000, alternative="less")
 
                 text = 'U test: {} > {}: {}'.format(mut_n, 'com',U_m)+'\nU test: {} < {}: {}'.format(mut_n, 'com', U_c,)+'\n-----------------------------------------\nT test: {} > {}: {}'.format(mut_n, 'com', T_m)+'\nT test: {} < {}: {}'.format(mut_n, 'com', T_c)+'\n-----------------------------------------\nKS test: {} > {}: {}'.format(mut_n, 'com', KS_m)+'\nKS test: {} < {}: {}'.format(mut_n, 'com', KS_c)
                 text += '\n-----------------------------------------\nPermutation test: {} > {}: {}'.format(mut_n, 'com', P_m)+'\nPermutation test: {} < {}: {}'.format(mut_n, 'com', P_c)
