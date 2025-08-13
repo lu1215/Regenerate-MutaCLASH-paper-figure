@@ -1,0 +1,256 @@
+from plot_import import *
+
+if tool=='pirScan':
+    score_type =  'targeting_score'
+else:
+    print('[Warning] 22G abundance only on pirScan.')
+    sys.exit(0)
+
+if abu_region:
+    top, two_third, one_third, bot = [float(x) for x in abu_region.split('/')]
+else:
+    one_third = np.quantile(list(data[score_type]), 0.333)
+    two_third = np.quantile(list(data[score_type]), 0.666)
+    top = max(data[score_type])
+    bot = min(data[score_type])
+    
+print('high: {} < S <= {}'.format(str(two_third), str(top)))
+print('mid: {} < S <= {}'.format(str(one_third), str(two_third)))
+print('low: {} < S <= {}'.format(str(bot), str(one_third)))
+
+# Gene List
+title_map_gene = {'0':'all mRNAs','1':'CSR-1 target','2':'WAGO-1 target', '8':'Germline target'}
+target = pd.read_excel('../../data/reference/add_two_HCLee.RNAseq.master.xlsx')
+if 'Gene ID' not in data:
+    print('no "Gene ID", using reference file: mRNA_WS275_IDtoName.csv')
+    data_id = pd.read_csv('../../data/reference/mRNA_WS275_IDtoName.csv')
+    data_id = data_id.rename(columns={'Gene name':'transcript_name'})
+    data = pd.merge(data, data_id, on='transcript_name', how='inner')
+
+# fold change 欄位
+alpha1 = find_alpha(data['22G_rc_WT'])
+alpha2 = find_alpha(data['22G_rc_MUT'])
+alpha = min([alpha1, alpha2])
+print('alpha: {}'.format(alpha))
+
+data['22G_rc_WT_alpha'] = [data['22G_rc_WT'][i]+alpha for i in range(len(data))]
+data['22G_rc_MUT_alpha'] = [data['22G_rc_MUT'][i]+alpha for i in range(len(data))]
+data['fold_change'] = [math.log(data['22G_rc_MUT_alpha'][i]/data['22G_rc_WT_alpha'][i], 2) for i in range(len(data))]
+print('number: {}'.format(len(data)))
+
+x1 = [n for n in data['22G_rc_MUT']]
+y1 = [n for n in data['22G_rc_WT']]
+no_0_list = []
+for i,j in zip(x1, y1):
+    if i != 0 and j != 0:
+        no_0_list.append(math.log(i/j, 2))
+    else:
+        no_0_list.append("NULL")
+data['fold_change_without0'] = no_0_list
+tmp_list = no_0_list.copy()
+tmp_list.remove("NULL")
+print('number (without0): {}'.format(len(tmp_list)))
+
+dn_list = ['all data', 'high score', 'middle score', 'low score']
+group_list = [1,2,8]
+
+# column for groupy by
+cD = 'single_read_mut_stat_significance_D'
+cM = 'single_read_mut_stat_significance_M'
+
+# generate specific group target
+ana_data = add_two_mRNA_list(data, target, group)
+
+# turn variable into bool type and fillna 
+for c in (cD, cM):
+    ana_data[c] = ana_data[c].fillna(False).astype(bool)
+
+# both single_read_mut_stat_significance_D and single_read_mut_stat_significance_M are False
+ctrl = ana_data[~ana_data[cD] & ~ana_data[cM]]
+
+# single_read_mut_stat_significance_D is True
+case_D = ana_data[ana_data[cD]]
+# single_read_mut_stat_significance_M is True
+case_M = ana_data[ana_data[cM]]
+
+mut_map = {'D': 'sgl_del_sig', 'M': 'sgl_mis_sig'}
+comparisons = [('D', mut_map['D'], case_D), ('M', mut_map['M'], case_M)]
+
+for group in group_list:
+    for mut, mut_n, case_df in comparisons:
+        print('\n=========', title_map_gene[str(group)], mut, '=========')
+        del_clash_result = case_df  # D True or M True
+        no_del_clash_result = ctrl  # D False and M False
+        print('sgl_mut_significance:', len(del_clash_result), 'no sgl_mut_significance:', len(no_del_clash_result))
+
+        # group by 3 score boundary
+        no_low_data    = no_del_clash_result[no_del_clash_result[score_type] <= one_third]
+        no_middle_data = no_del_clash_result[(no_del_clash_result[score_type] > one_third) &
+                                            (no_del_clash_result[score_type] <= two_third)]
+        no_high_data   = no_del_clash_result[(no_del_clash_result[score_type] > two_third) &
+                                            (no_del_clash_result[score_type] <= top)]
+
+        del_low_data    = del_clash_result[del_clash_result[score_type] <= one_third]
+        del_middle_data = del_clash_result[(del_clash_result[score_type] > one_third) &
+                                        (del_clash_result[score_type] <= two_third)]
+        del_high_data   = del_clash_result[(del_clash_result[score_type] > two_third) &
+                                        (del_clash_result[score_type] <= top)]
+
+        d1_list = [del_clash_result, del_high_data, del_middle_data, del_low_data]
+        d2_list = [no_del_clash_result, no_high_data, no_middle_data, no_low_data]
+
+        print('no {}: '.format('mut'), 'high', len(no_high_data), 'mid', len(no_middle_data), 'low', len(no_low_data))
+        print('{}: '.format(mut), 'high', len(del_high_data), 'mid', len(del_middle_data), 'low', len(del_low_data))
+
+        print("\nPlot 22G read count")
+        d_n = 0
+        for d1, d2 in zip(d1_list, d2_list):
+    
+            print(d_n, title_map_gene[str(group)], dn_list[d_n], mut_n, 'with mutation')
+            # plot
+            # x = [math.log((n/nor_f)*1000000, 10) if n != 0 else 0 for n in d1['22G_rc_WT']]
+            # y = [math.log((n/nor_f)*1000000, 10) if n != 0 else 0 for n in d2['22G_rc_WT']]
+            x = [n/nor_f for n in d1['22G_rc_WT']]
+            y = [n/nor_f for n in d2['22G_rc_WT']]
+            tmp1 = pd.Series(list(x))
+            tmp2 = pd.Series(list(y))
+            mean1 = round(np.mean(list(x)), 3)
+            mean2 = round(np.mean(list(y)), 3)
+            median1 = round(np.quantile(list(x), 0.5), 3)
+            median2 = round(np.quantile(list(y), 0.5), 3)
+            tmp = pd.DataFrame({'with {}\nN={}\nmean: {}\nmedian: {}'.format(mut_n, str(len(x)), str(mean1), str(median1)): tmp1,
+                                'without {}\nN={}\nmean: {}\nmedian: {}'.format('mut', str(len(y)), str(mean2), str(median2)): tmp2})
+
+            plt.figure(figsize = (6,5))
+            plt.ylabel('22G read count', fontsize=15)
+            plt.tick_params(axis='x', labelsize=12)
+            ax = sns.boxplot(data=tmp, showfliers=False, width=0.5, linewidth=1, showmeans=0,medianprops=dict(color='orange'),
+                             order=tmp.columns.to_list()[::-1], whis=1.5, boxprops = {'facecolor':'pink', 'alpha':0.7}, whiskerprops={'linestyle':'--'})
+            # add_stat_annotation(ax,data=tmp,
+            #                    box_pairs=[('with\nmut','without\nmut')],
+            #                    test='Wilcoxon test', text_format='full', loc='outside', verbose=2,fontsize=12)
+            for p in ax.artists:
+                b, o, g, a = p.get_facecolor()
+                p.set_facecolor((b, o, g, 0.3))
+
+            out = U_test(list(x), list(y))
+            U_m = np.format_float_scientific(out[1], precision = 1)
+            U_c = np.format_float_scientific(out[2], precision = 1)
+            out = T_test(list(x), list(y))
+            T_m = np.format_float_scientific(out[1], precision = 1)
+            T_c = np.format_float_scientific(out[2], precision = 1)
+            out = KS_test(list(x), list(y))
+            KS_m = np.format_float_scientific(out[1], precision = 1)
+            KS_c = np.format_float_scientific(out[2], precision = 1)
+            _, P_m = permutation_test(list(x), list(y), num_permutations=10000, alternative="greater")
+            _, P_c = permutation_test(list(x), list(y), num_permutations=10000, alternative="less")
+
+            text = 'U test: {} > {}: {}'.format(mut_n, 'com',U_m)+'\nU test: {} < {}: {}'.format(mut_n, 'com', U_c,)+'\n-----------------------------------------\nT test: {} > {}: {}'.format(mut_n, 'com', T_m)+'\nT test: {} < {}: {}'.format(mut_n, 'com', T_c)+'\n-----------------------------------------\nKS test: {} > {}: {}'.format(mut_n, 'com', KS_m)+'\nKS test: {} < {}: {}'.format(mut_n, 'com', KS_c)
+            text += '\n-----------------------------------------\nPermutation test: {} > {}: {}'.format(mut_n, 'com', P_m)+'\nPermutation test: {} < {}: {}'.format(mut_n, 'com', P_c)
+            #print(text)
+            plt.text(1.6,0,text,fontsize=12)
+            plt.savefig('figure/G22_plot/22G/{}_group{}_{}_{}_{}_with_sgl_mut_sig.{}'.format(d_name, str(group), mut, dn_list[d_n], score_type, fig_type), bbox_inches='tight')
+            plt.clf()
+            plt.close()
+            gc.collect()
+            d_n += 1
+
+        print("\nPlot FOLD CHANGE")
+        d_n = 0
+        for d1, d2 in zip(d1_list, d2_list):
+    
+            print(d_n, title_map_gene[str(group)], dn_list[d_n], mut_n, 'with mutation')
+            # plot
+            x = d1['fold_change']
+            y = d2['fold_change']
+            tmp1 = pd.Series(list(x))
+            tmp2 = pd.Series(list(y))
+            mean1 = round(np.mean(list(x)), 3)
+            mean2 = round(np.mean(list(y)), 3)
+            median1 = round(np.quantile(list(x), 0.5), 3)
+            median2 = round(np.quantile(list(y), 0.5), 3)
+            fig, (ax1, ax2) = plt.subplots(2,1, figsize=(8, 10))
+            tmp = pd.DataFrame({'with {}\nN={}\nmean: {}\nmedian: {}'.format(mut_n, str(len(x)), str(mean1), str(median1)): tmp1,
+                                'without {}\nN={}\nmean: {}\nmedian: {}'.format('mut', str(len(y)), str(mean2), str(median2)): tmp2})
+            
+            ax1.set_ylabel('log2 (mut+α/wt+α)', fontsize=15)
+            ax1.set_title('22G FOLD Change (with 0)',fontsize=12)
+            ax1.tick_params(axis='x', labelsize=12)
+            sns.boxplot(data=tmp, ax=ax1, showfliers=False, width=0.5, linewidth=1, showmeans=0,medianprops=dict(color='orange'),
+                        order=tmp.columns.to_list()[::-1], whis=1.5, boxprops = {'facecolor':'pink', 'alpha':0.7}, whiskerprops={'linestyle':'--'})
+            for p in ax1.artists:
+                b, o, g, a = p.get_facecolor()
+                p.set_facecolor((b, o, g, 0.3))
+
+
+            out = U_test(list(x), list(y))
+            U_m = np.format_float_scientific(out[1], precision = 1)
+            U_c = np.format_float_scientific(out[2], precision = 1)
+            out = T_test(list(x), list(y))
+            T_m = np.format_float_scientific(out[1], precision = 1)
+            T_c = np.format_float_scientific(out[2], precision = 1)
+            out = KS_test(list(x), list(y))
+            KS_m = np.format_float_scientific(out[1], precision = 1)
+            KS_c = np.format_float_scientific(out[2], precision = 1)
+            _, P_m = permutation_test(list(x), list(y), num_permutations=10000, alternative="greater")
+            _, P_c = permutation_test(list(x), list(y), num_permutations=10000, alternative="less")
+
+
+            text = 'U test: {} > {}: {}'.format(mut_n, 'com',U_m)+'\nU test: {} < {}: {}'.format(mut_n, 'com', U_c,)+'\n-----------------------------------------\nT test: {} > {}: {}'.format(mut_n, 'com', T_m)+'\nT test: {} < {}: {}'.format(mut_n, 'com', T_c)+'\n-----------------------------------------\nKS test: {} > {}: {}'.format(mut_n, 'com', KS_m)+'\nKS test: {} < {}: {}'.format(mut_n, 'com', KS_c)
+            text += '\n-----------------------------------------\nPermutation test: {} > {}: {}'.format(mut_n, 'com', P_m)+'\nPermutation test: {} < {}: {}'.format(mut_n, 'com', P_c)
+            #print(text)
+            ax1.text(1.6,0,text,fontsize=12, verticalalignment='top')
+            
+            
+            x = [n for n in d1['fold_change_without0'] if n != 'NULL']
+            y = [n for n in d2['fold_change_without0'] if n != 'NULL']
+            tmp1 = pd.Series(list(x))
+            tmp2 = pd.Series(list(y))
+            if len(x)==0:
+                mean1 = 'N/A'
+                median1 = 'N/A'
+            else:
+                mean1 = round(np.mean(list(x)), 3)
+                median1 = round(np.quantile(list(x), 0.5), 3)
+            if len(y)==0:
+                mean2 = 'N/A'
+                median2 = 'N/A'
+            else:
+                mean2 = round(np.mean(list(y)), 3)
+                median2 = round(np.quantile(list(y), 0.5), 3)
+            tmp = pd.DataFrame({'with {}\nN={}\nmean: {}\nmedian: {}'.format(mut_n, str(len(x)), str(mean1), str(median1)): tmp1,
+                                'without {}\nN={}\nmean: {}\nmedian: {}'.format('mut', str(len(y)), str(mean2), str(median2)): tmp2})
+        
+            ax2.set_ylabel('log2 (mut/wt)', fontsize=15)
+            ax2.set_title('22G FOLD Change (without 0)',fontsize=12)
+            ax2.tick_params(axis='x', labelsize=12)
+            sns.boxplot(data=tmp, ax=ax2, showfliers=False, width=0.5, linewidth=1, showmeans=0,medianprops=dict(color='orange'),
+                        order=tmp.columns.to_list()[::-1], whis=1.5, boxprops = {'facecolor':'pink', 'alpha':0.7}, whiskerprops={'linestyle':'--'})
+            for p in ax2.artists:
+                b, o, g, a = p.get_facecolor()
+                p.set_facecolor((b, o, g, 0.3))
+
+
+            out = U_test(list(x), list(y))
+            U_m = np.format_float_scientific(out[1], precision = 1)
+            U_c = np.format_float_scientific(out[2], precision = 1)
+            out = T_test(list(x), list(y))
+            T_m = np.format_float_scientific(out[1], precision = 1)
+            T_c = np.format_float_scientific(out[2], precision = 1)
+            out = KS_test(list(x), list(y))
+            KS_m = np.format_float_scientific(out[1], precision = 1)
+            KS_c = np.format_float_scientific(out[2], precision = 1)
+            _, P_m = permutation_test(list(x), list(y), num_permutations=10000, alternative="greater")
+            _, P_c = permutation_test(list(x), list(y), num_permutations=10000, alternative="less")
+            
+            text = 'U test: {} > {}: {}'.format(mut_n, 'com',U_m)+'\nU test: {} < {}: {}'.format(mut_n, 'com', U_c,)+'\n-----------------------------------------\nT test: {} > {}: {}'.format(mut_n, 'com', T_m)+'\nT test: {} < {}: {}'.format(mut_n, 'com', T_c)+'\n-----------------------------------------\nKS test: {} > {}: {}'.format(mut_n, 'com', KS_m)+'\nKS test: {} < {}: {}'.format(mut_n, 'com', KS_c)
+            text += '\n-----------------------------------------\nPermutation test: {} > {}: {}'.format(mut_n, 'com', P_m)+'\nPermutation test: {} < {}: {}'.format(mut_n, 'com', P_c)
+            #print(text)
+            ax2.text(1.6,0,text,fontsize=12, verticalalignment='top')
+            plt.tight_layout()
+            plt.savefig('figure/G22_plot/FOLD/{}_group{}_{}_{}_{}_with_sgl_mut_sig.{}'.format(d_name, str(group), mut, dn_list[d_n], score_type, fig_type))
+            plt.clf()
+            plt.close()
+            gc.collect()
+            
+            d_n += 1

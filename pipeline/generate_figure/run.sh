@@ -22,6 +22,8 @@ fi
 echo "plot abundance"
 if [ $TYPE = "abu" ]; then
     python plot_nofilter_mRNA_abu.py ${ARGS} > log/${1}_abundance.log
+    python plot_mRNA_abu_group_by_sgl_mut_sig.py ${ARGS} >> log/${1}_abundance.log
 elif [ $TYPE = "region" ] || [ $TYPE = "site" ] || [ $TYPE = "up" ]; then
     python plot_nofilter_22G_abu.py ${ARGS} > log/${1}_abundance.log
+    python plot_22G_abu_group_by_sgl_mut_sig.py ${ARGS} > log/${1}_abundance.log
 fi
