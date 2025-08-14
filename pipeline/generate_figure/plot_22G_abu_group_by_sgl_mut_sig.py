@@ -58,25 +58,26 @@ group_list = [1,2,8]
 cD = 'single_read_mut_stat_significance_D'
 cM = 'single_read_mut_stat_significance_M'
 
-# generate specific group target
-ana_data = add_two_mRNA_list(data, target, group)
 
-# turn variable into bool type and fillna 
-for c in (cD, cM):
-    ana_data[c] = ana_data[c].fillna(False).astype(bool)
-
-# both single_read_mut_stat_significance_D and single_read_mut_stat_significance_M are False
-ctrl = ana_data[~ana_data[cD] & ~ana_data[cM]]
-
-# single_read_mut_stat_significance_D is True
-case_D = ana_data[ana_data[cD]]
-# single_read_mut_stat_significance_M is True
-case_M = ana_data[ana_data[cM]]
-
-mut_map = {'D': 'sgl_del_sig', 'M': 'sgl_mis_sig'}
-comparisons = [('D', mut_map['D'], case_D), ('M', mut_map['M'], case_M)]
 
 for group in group_list:
+    # generate specific group target
+    ana_data = add_two_mRNA_list(data, target, group)
+
+    # turn variable into bool type and fillna 
+    for c in (cD, cM):
+        ana_data[c] = ana_data[c].fillna(False).astype(bool)
+
+    # both single_read_mut_stat_significance_D and single_read_mut_stat_significance_M are False
+    ctrl = ana_data[~ana_data[cD] & ~ana_data[cM]]
+
+    # single_read_mut_stat_significance_D is True
+    case_D = ana_data[ana_data[cD]]
+    # single_read_mut_stat_significance_M is True
+    case_M = ana_data[ana_data[cM]]
+
+    mut_map = {'D': 'sgl_del_sig', 'M': 'sgl_mis_sig'}
+    comparisons = [('D', mut_map['D'], case_D), ('M', mut_map['M'], case_M)]
     for mut, mut_n, case_df in comparisons:
         print('\n=========', title_map_gene[str(group)], mut, '=========')
         del_clash_result = case_df  # D True or M True
